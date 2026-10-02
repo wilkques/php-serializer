@@ -21,6 +21,9 @@ class Yaml
      * @param string $contents
      *
      * @return array
+     *
+     * @throws \RuntimeException if a non-blank, non-comment line is
+     *     neither a sequence item ("- ...") nor a "key: value" mapping.
      */
     public static function parse($contents)
     {
@@ -320,6 +323,10 @@ class Yaml
     protected static function splitMappingLine($content, $lines, &$index, $indent)
     {
         $colonPosition = strpos($content, ':');
+
+        if ($colonPosition === false) {
+            throw new \RuntimeException('Malformed YAML line (expected "key: value" or "- item"): ' . $content);
+        }
 
         $key = trim(substr($content, 0, $colonPosition));
 

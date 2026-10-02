@@ -1,0 +1,60 @@
+name: TESTS
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.operating-system }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ubuntu-latest]
+        # composer.json declares "php": ">=5.3" (the hand-rolled src/ parsers
+        # are written to run on it), but no installable "phpunit/phpunit"
+        # version can actually produce a working autoloader below PHP 5.6:
+        # verified by hand against a real php:5.3.29-cli container — Composer
+        # 2.3+ refuses to even generate an autoloader on PHP <5.6, and the
+        # only Composer that still can (1.x) fails to run its own phar under
+        # a modern host PHP the way a CI runner would invoke it. PHP 5.4/5.5
+        # are assumed to hit the same wall (same Composer-side cutoff), not
+        # individually verified. PHP 5.6 is the confirmed, actually-working
+        # floor for this matrix: verified for real against a php:5.6-cli
+        # container, where composer resolves PHPUnit 5.7.x (first version
+        # with the PHPUnit\Framework\TestCase namespace alias) successfully.
+        php-versions: ['5.6', '7.4', '8.0', '8.1', '8.2', '8.3']
+
+    name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-versions }}
+        ini-values: "post_max_size=256M" #optional
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-${{ matrix.php-versions }}
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Fix File Permissions
+      run: chmod +x tests/phpunit
+
+    - name: Run test
+      run: tests/phpunit

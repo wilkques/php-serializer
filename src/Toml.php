@@ -23,6 +23,9 @@ class Toml
      * @param string $contents
      *
      * @return array
+     *
+     * @throws \RuntimeException if a non-blank, non-comment line is
+     *     neither a "[table]" header nor a "key = value" pair.
      */
     public static function parse($contents)
     {
@@ -40,7 +43,7 @@ class Toml
             $equalsPosition = strpos($line, '=');
 
             if ($equalsPosition === false) {
-                continue;
+                throw new \RuntimeException('Malformed TOML line (expected "key = value" or "[table]"): ' . $line);
             }
 
             $key = trim(substr($line, 0, $equalsPosition));

@@ -120,4 +120,25 @@ class YamlTest extends TestCase
 
         $this->assertEquals($data, Yaml::parse(Yaml::encode($data)));
     }
+
+    public function testEncodeEmptyArrayDegradesToNull()
+    {
+        // encodeBlock() returns '' for an empty array, so "key: []" has no
+        // flow-style equivalent in this parser's subset - it round-trips
+        // as "key:\n" / null instead, not back to an empty array.
+        $this->assertEquals(array('abc' => null), Yaml::parse(Yaml::encode(array('abc' => array()))));
+    }
+
+    public function testParseThrowsOnMalformedLine()
+    {
+        $thrown = false;
+
+        try {
+            Yaml::parse('plainword');
+        } catch (\RuntimeException $e) {
+            $thrown = true;
+        }
+
+        $this->assertTrue($thrown);
+    }
 }

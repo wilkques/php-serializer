@@ -25,6 +25,8 @@ class Ini
      * @param string $contents
      *
      * @return array
+     *
+     * @throws \RuntimeException if parse_ini_string() rejects the contents.
      */
     public static function parse($contents)
     {

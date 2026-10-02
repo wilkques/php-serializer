@@ -79,4 +79,24 @@ class TomlTest extends TestCase
 
         $this->assertEquals($data, Toml::parse(Toml::encode($data)));
     }
+
+    public function testEncodeRoundTripsTableContainingInlineArray()
+    {
+        $data = array('hij' => array('tags' => array('a', 'b'), 'lmn' => 'opq'));
+
+        $this->assertEquals($data, Toml::parse(Toml::encode($data)));
+    }
+
+    public function testParseThrowsOnMalformedLine()
+    {
+        $thrown = false;
+
+        try {
+            Toml::parse('plainword');
+        } catch (\RuntimeException $e) {
+            $thrown = true;
+        }
+
+        $this->assertTrue($thrown);
+    }
 }

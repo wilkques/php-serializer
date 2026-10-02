@@ -61,4 +61,17 @@ class DotEnvTest extends TestCase
 
         $this->assertEquals($data, DotEnv::parse(DotEnv::encode($data)));
     }
+
+    public function testParseThrowsOnMalformedLine()
+    {
+        $thrown = false;
+
+        try {
+            DotEnv::parse('PLAINWORD');
+        } catch (\RuntimeException $e) {
+            $thrown = true;
+        }
+
+        $this->assertTrue($thrown);
+    }
 }

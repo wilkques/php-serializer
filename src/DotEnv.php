@@ -18,6 +18,8 @@ class DotEnv
      * @param string $contents
      *
      * @return array
+     *
+     * @throws \RuntimeException if a non-blank, non-comment line has no "=".
      */
     public static function parse($contents)
     {
@@ -33,7 +35,7 @@ class DotEnv
             }
 
             if (strpos($line, '=') === false) {
-                continue;
+                throw new \RuntimeException('Malformed .env line (expected "KEY=value"): ' . $line);
             }
 
             list($key, $value) = explode('=', $line, 2);
