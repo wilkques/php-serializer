@@ -1,0 +1,22 @@
+{
+    "name": "wilkques/serializer",
+    "license": "MIT",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Wilkques\\Serializer\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Wilkques\\Serializer\\Tests\\": "tests/"
+        }
+    },
+    "require": {
+        "php": ">=5.3",
+        "wilkques/php-helper": "^6.1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    }
+}
